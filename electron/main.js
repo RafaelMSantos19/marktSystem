@@ -5,19 +5,23 @@ require('electron-reload')(__dirname, {
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 
-function createWindow () {
+function createWindow() {
   const win = new BrowserWindow({
     fullscreen: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // opcional
-      nodeIntegration: true
+      preload: path.join(__dirname, 'preload.js'), // garante segurança
+      nodeIntegration: true, // se for usar require no renderer
+      contextIsolation: true // importante para preload funcionar direito
     }
   });
 
   win.loadFile('index.html');
-  // win.webContents.openDevTools(); // Descomente para debug
+
+  // Descomente para debug:
+  // win.webContents.openDevTools();
 }
 
+// Cria a janela quando o app estiver pronto
 app.whenReady().then(() => {
   createWindow();
 
@@ -26,11 +30,12 @@ app.whenReady().then(() => {
   });
 });
 
+// Fecha o app no Windows/Linux se todas as janelas forem fechadas
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-
+// Recebe evento de confirmação de saída
 ipcMain.on('confirmar-saida', async (event) => {
   const result = await dialog.showMessageBox({
     type: 'question',

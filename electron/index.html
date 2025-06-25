@@ -10,11 +10,14 @@
     <div class="lado-esquerdo">
       <img src="logo.png" alt="Logo do Mercado" class="logo">
       <div id="relogio" class="relogio">00:00:00 00/00/0000</div>
+      <div class="resumo-total" id="resumo-produtos">
+          <div class="titulo-total">Valor da compra:</div>
+          <div class="valor-total" id="valor-total">R$ 0,00</div>
+      </div>
     </div>
 
     <div class="lado-direito">
       <div class="display" id="lista-produtos"></div>
-      <div class="total" id="total-geral">Total: R$ 0,00</div>
       <div class="controls">
         <input type="text" id="codigo-barra" placeholder="Digite ou escaneie o código de barras" autofocus />
         <button onclick="finalizarVenda()">Finalizar Venda</button>
@@ -24,7 +27,6 @@
 
   <script>
     const lista = document.getElementById('lista-produtos');
-    const totalView = document.getElementById('total-geral');
     const input = document.getElementById('codigo-barra');
 
     let produtos = [];
@@ -33,8 +35,21 @@
     const produtosFake = {
       "7891234567890": { nome: "Arroz 5kg", valor: 25.99 },
       "7899876543210": { nome: "Feijão 1kg", valor: 8.50 },
-      "7890001112223": { nome: "Macarrão", valor: 4.75 }
+      "7890001112223": { nome: "Macarrão", valor: 4.75 },
+      "7894561237890": { nome: "Óleo 900ml", valor: 7.80 },
+      "7893216549870": { nome: "Açúcar 1kg", valor: 4.20 }
     };
+
+    // Simulação inicial para visualização
+    produtos = [
+      produtosFake["7891234567890"],
+      produtosFake["7899876543210"],
+      produtosFake["7891234567890"],
+      produtosFake["7890001112223"],
+      produtosFake["7899876543210"]
+    ];
+    total = produtos.reduce((sum, p) => sum + p.valor, 0);
+    atualizarTela();
 
     input.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
@@ -54,17 +69,30 @@
     });
 
     function atualizarTela() {
+      // Agrupar produtos por nome
+      const agrupado = {};
+      produtos.forEach(p => {
+        if (!agrupado[p.nome]) {
+          agrupado[p.nome] = { ...p, quantidade: 0, total: 0 };
+        }
+        agrupado[p.nome].quantidade += 1;
+        agrupado[p.nome].total += p.valor;
+      });
+
+      // Atualizar lista da direita
       lista.innerHTML = '';
-      produtos.forEach((p) => {
+      Object.values(agrupado).forEach((p) => {
         const div = document.createElement('div');
         div.classList.add('produto');
-        div.innerHTML = `<span>${p.nome}</span><span>R$ ${p.valor.toFixed(2)}</span>`;
+        div.innerHTML = `<span>${p.nome} × ${p.quantidade}</span><span>R$ ${p.total.toFixed(2)}</span>`;
         lista.appendChild(div);
       });
 
-      totalView.innerText = `Total: R$ ${total.toFixed(2)}`;
+      // Atualizar valor total no painel esquerdo
+      const valorTotal = produtos.reduce((sum, p) => sum + p.valor, 0);
+      document.getElementById('valor-total').innerText = `R$ ${valorTotal.toFixed(2)}`;
     }
-
+    
     function finalizarVenda() {
       if (produtos.length === 0) return alert("Nenhum produto para finalizar.");
       alert("Venda finalizada!");
@@ -73,13 +101,14 @@
       atualizarTela();
     }
 
+    // Esc para sair
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         window.electronAPI.confirmarSaida();
       }
     });
 
-    // ⏰ Relógio
+    // Relógio
     function atualizarRelogio() {
       const agora = new Date();
       const hora = agora.toLocaleTimeString('pt-BR');
