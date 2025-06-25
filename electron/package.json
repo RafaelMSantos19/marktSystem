@@ -2,9 +2,17 @@
   "name": "electron",
   "version": "1.0.0",
   "main": "main.js",
+  "build": {
+    "appId": "com.marktSystem.app",
+    "productName": "marktSystem",
+    "win": {
+      "target": "nsis"
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
   },
   "keywords": [],
   "author": "",
