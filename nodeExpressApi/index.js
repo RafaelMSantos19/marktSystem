@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const { Produto } = require('./models');
 const app = express();
 const PORT = process.env.PORT;
 
@@ -25,6 +26,16 @@ app.post('/usuarios', (req, res) => {
   const usuario = req.body;
   // Aqui você normalmente salvaria no banco de dados
   res.status(201).json({ mensagem: 'Usuário criado!', usuario });
+});
+
+app.get('/produtos', async (req, res) => {
+  try {
+    const produtos = await Produto.findAll();
+    res.json(produtos);
+  } catch (err) {
+    console.error('Erro ao buscar produtos:', err);
+    res.status(500).json({ erro: 'Erro interno ao buscar produtos' });
+  }
 });
 
 // Inicia o servidor
