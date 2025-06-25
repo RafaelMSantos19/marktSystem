@@ -2,10 +2,73 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Meu App Electron</title>
+  <title>Caixa de Supermercado</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Bem-vindo ao meu app!</h1>
-  <p>Você está rodando Electron com Node.js</p>
+  <div class="container">
+    <div class="display" id="lista-produtos">
+      <!-- Produtos inseridos serão adicionados aqui -->
+    </div>
+
+    <div class="total" id="total-geral">Total: R$ 0,00</div>
+
+    <div class="controls">
+      <input type="text" id="codigo-barra" placeholder="Digite ou escaneie o código de barras" autofocus />
+      <button onclick="finalizarVenda()">Finalizar Venda</button>
+    </div>
+  </div>
+
+  <script>
+    const lista = document.getElementById('lista-produtos');
+    const totalView = document.getElementById('total-geral');
+    const input = document.getElementById('codigo-barra');
+
+    let produtos = [];
+    let total = 0;
+
+    const produtosFake = {
+      "7891234567890": { nome: "Arroz 5kg", valor: 25.99 },
+      "7899876543210": { nome: "Feijão 1kg", valor: 8.50 },
+      "7890001112223": { nome: "Macarrão", valor: 4.75 }
+    };
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const codigo = input.value.trim();
+        const produto = produtosFake[codigo];
+
+        if (produto) {
+          produtos.push(produto);
+          total += produto.valor;
+          atualizarTela();
+        } else {
+          alert("Produto não encontrado");
+        }
+
+        input.value = '';
+      }
+    });
+
+    function atualizarTela() {
+      lista.innerHTML = '';
+      produtos.forEach((p) => {
+        const div = document.createElement('div');
+        div.classList.add('produto');
+        div.innerHTML = `<span>${p.nome}</span><span>R$ ${p.valor.toFixed(2)}</span>`;
+        lista.appendChild(div);
+      });
+
+      totalView.innerText = `Total: R$ ${total.toFixed(2)}`;
+    }
+
+    function finalizarVenda() {
+      if (produtos.length === 0) return alert("Nenhum produto para finalizar.");
+      alert("Venda finalizada!");
+      produtos = [];
+      total = 0;
+      atualizarTela();
+    }
+  </script>
 </body>
 </html>
