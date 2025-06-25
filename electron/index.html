@@ -6,16 +6,19 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="display" id="lista-produtos">
-      <!-- Produtos inseridos serão adicionados aqui -->
+  <div class="layout">
+    <div class="lado-esquerdo">
+      <img src="logo.png" alt="Logo do Mercado" class="logo">
+      <div id="relogio" class="relogio">00:00:00 00/00/0000</div>
     </div>
 
-    <div class="total" id="total-geral">Total: R$ 0,00</div>
-
-    <div class="controls">
-      <input type="text" id="codigo-barra" placeholder="Digite ou escaneie o código de barras" autofocus />
-      <button onclick="finalizarVenda()">Finalizar Venda</button>
+    <div class="lado-direito">
+      <div class="display" id="lista-produtos"></div>
+      <div class="total" id="total-geral">Total: R$ 0,00</div>
+      <div class="controls">
+        <input type="text" id="codigo-barra" placeholder="Digite ou escaneie o código de barras" autofocus />
+        <button onclick="finalizarVenda()">Finalizar Venda</button>
+      </div>
     </div>
   </div>
 
@@ -76,6 +79,15 @@
       }
     });
 
+    // ⏰ Relógio
+    function atualizarRelogio() {
+      const agora = new Date();
+      const hora = agora.toLocaleTimeString('pt-BR');
+      const data = agora.toLocaleDateString('pt-BR');
+      document.getElementById('relogio').innerText = `${hora} ${data}`;
+    }
+    setInterval(atualizarRelogio, 1000);
+    atualizarRelogio();
   </script>
 </body>
 </html>
